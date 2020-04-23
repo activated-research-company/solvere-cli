@@ -3,12 +3,13 @@ import { Question } from '../question/question';
 import { Command } from 'commander';
 import { Inquirer } from 'inquirer';
 import { Cli } from './cli';
+import { TYPES } from '../types';
 
 @injectable()
 class CliImpl implements Cli {
   constructor(
-    @inject('Command') private command: Command,
-    @inject ('Inquirer') private inquirer: Inquirer,
+    @inject(TYPES.Command) private command: Command,
+    @inject(TYPES.Inquirer) private inquirer: Inquirer,
   ) {}
 
   public version(str: string): Cli {
