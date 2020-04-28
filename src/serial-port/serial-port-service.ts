@@ -1,19 +1,35 @@
 import SerialPort from 'serialport';
+import { Observable, Subject } from 'rxjs';
+import { Answers } from 'inquirer';
 import { DeviceAnswers } from '../question/device-question';
 import VocDeviceConfigurer from '../serial-device/voc-device-configurer';
-import { Answers } from '../question/answers';
+import Advisor from '../advisor/advisor';
+
+class ConfigurationResult {
+  constructor(
+    public device: string,
+    public configured: boolean,
+    public error?: string,
+  ) {
+    this.error = !error ? '' : error;
+  }
+}
 
 class SerialPortService {
-  serialPorts: string[];
-  targetDeviceType: string;
+  private serialPorts: string[] = [];
+  private targetDeviceType: string = '';
+  public subject: Subject<ConfigurationResult>;
 
-  constructor() {
-    this.serialPorts = []
-    this.targetDeviceType = '';
+  constructor(private advisor: Advisor) {
+    this.subject = new Subject();
     this.reset();
   }
 
-  reset(): Promise<void> {
+  public getObservable(): Observable<any> {
+    return this.subject;
+  }
+
+  private reset(): Promise<void> {
     return SerialPort
     .list()
     .then((ports) => {
@@ -23,16 +39,42 @@ class SerialPortService {
       });
     });
   }
+
+  private onAnsweredQuestion({ name, answer }: Answers): void {
+    switch (name.split('|')[0]) {
+      case 'device':
+        this.targetDeviceType = answer;
+        break;
+      case 'isDevicePluggedInOne':
+        if (!answer) { this.reset(); }
+        break;
+      case 'isDevicePluggedInTwo':
+        if (answer) {
+          this.findNewSerialPort()
+            .then(this.configure.bind(this))
+            .then(() => {
+              this.subject.next(new ConfigurationResult(this.targetDeviceType, true))
+            })
+            .catch((error) => {
+              this.subject.next(new ConfigurationResult(this.targetDeviceType, false, error));
+            });;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  public connect(observable: Observable<Answers>) {
+    observable.subscribe(this.onAnsweredQuestion.bind(this));
+    return this;
+  }
   
-  getTargetDeviceType(): string {
+  public getTargetDeviceType(): string {
     return this.targetDeviceType;
   }
 
-  setTargetDeviceType(newTargetDeviceType: string): void {
-    this.targetDeviceType = newTargetDeviceType;
-  }
-
-  findNewSerialPort(): Promise<SerialPort | null> {
+  private findNewSerialPort(): Promise<SerialPort | null> {
     return SerialPort
       .list()
       .then((ports) => {
@@ -42,21 +84,17 @@ class SerialPortService {
           });
         });
       })
-      .then((port) => {
-        if (port) {
-          return new SerialPort(port.path)
-        }
-        return null;
-    });
+      .then((port) => port ? new SerialPort(port.path) : null);
   }
   
-  configure(serialPort: SerialPort): Promise<boolean> {
+  configure(serialPort: SerialPort | null): Promise<boolean> {
+    if (!serialPort) { return Promise.reject(`I could not locate the ${this.targetDeviceType}.`); }
     switch (this.targetDeviceType) {
       case DeviceAnswers.vocSensor:
         return new VocDeviceConfigurer().configure(serialPort);
     }
-    return Promise.resolve(false);
+    return Promise.reject('This device is not a valid choice.');
   }
 }
 
-export default new SerialPortService()
+export { SerialPortService, ConfigurationResult };
