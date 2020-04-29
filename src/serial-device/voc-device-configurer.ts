@@ -8,20 +8,25 @@ class VocDeviceConfigurer implements SerialDeviceConfigurer {
   }
 
   configure(serialPort: SerialPort): Promise<boolean> {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         serialPort.on('data', (data) => {
           if (this.parseData(data) === '*** Config: Set output format to JSON.') {
             serialPort.close();
             resolve(true);
           }
         });
-        serialPort.write('J');
+
+        serialPort.open(() => {
+          serialPort.write('J');
+        })
+
         setTimeout(() => {
           if (serialPort.isOpen) {
             serialPort.close();
-            resolve(false);
+            reject('I did not receive a response from the sensor.');
           }
         }, 5000);
+
       return true;
     });
   }

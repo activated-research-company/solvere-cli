@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { Answers } from 'inquirer';
+import chalk from 'chalk';
 
 class Advisor {
   private adviseGiven: boolean = false;
@@ -16,10 +17,10 @@ class Advisor {
     if (!this.adviseGiven) { console.log(''); }
   }
 
-  public advise(message?: string): Advisor {
+  public advise(message?: string, color?: chalk.Chalk): Advisor {
     if (message) {
       this.newLine();
-      console.log(message);
+      console.log(color ? color(message) : message);
       this.newLine();
       this.adviseGiven = true;
     }

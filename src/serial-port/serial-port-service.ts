@@ -4,6 +4,7 @@ import { Answers } from 'inquirer';
 import { DeviceAnswers } from '../question/device-question';
 import VocDeviceConfigurer from '../serial-device/voc-device-configurer';
 import Advisor from '../advisor/advisor';
+import AlicatDeviceConfigurer from '../serial-device/alicat-device-configurer';
 
 class ConfigurationResult {
   constructor(
@@ -46,10 +47,10 @@ class SerialPortService {
         this.targetDeviceType = answer;
         break;
       case 'isDevicePluggedInOne':
-        if (answer === 'NO') { this.reset(); }
+        if (answer === 'No') { this.reset(); }
         break;
       case 'isDevicePluggedInTwo':
-        if (answer === 'YES') {
+        if (answer === 'Yes') {
           this.findNewSerialPort()
             .then(this.configure.bind(this))
             .then(() => {
@@ -84,7 +85,7 @@ class SerialPortService {
           });
         });
       })
-      .then((port) => port ? new SerialPort(port.path) : null);
+      .then((port) => port ? new SerialPort(port.path, { autoOpen: false }) : null);
   }
   
   configure(serialPort: SerialPort | null): Promise<boolean> {
@@ -92,6 +93,8 @@ class SerialPortService {
     switch (this.targetDeviceType) {
       case DeviceAnswers.vocSensor:
         return new VocDeviceConfigurer().configure(serialPort);
+      case DeviceAnswers.cellAir:
+        return new AlicatDeviceConfigurer().configure(serialPort);
     }
     return Promise.reject('This device is not a valid choice.');
   }

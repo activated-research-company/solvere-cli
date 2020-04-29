@@ -7,6 +7,7 @@ import { IsDevicePluggedInQuestionOne } from './is-device-plugged-in-question-on
 import { IsDevicePluggedInQuestionTwo } from './is-device-plugged-in-question-two';
 import { AnotherDeviceQuestion } from './another-device-question';
 import { ConfigurationResult } from '../serial-port/serial-port-service';
+import chalk from 'chalk';
 
 class QuestionRouter {
 
@@ -24,7 +25,7 @@ class QuestionRouter {
       this.advise(`I've succesfully configured the ${device}.`)
       return this.next(new AnotherDeviceQuestion(this.nextQuestionNumber));
     }
-    this.advise(error);
+    this.advise(error, chalk.red);
     return this.next(new AnotherDeviceQuestion(this.nextQuestionNumber));
   }
 
@@ -38,8 +39,8 @@ class QuestionRouter {
     return this;
   }
 
-  private advise(message?: string): void {
-    this.advisor.advise(message);
+  private advise(message?: string, color?: chalk.Chalk): void {
+    this.advisor.advise(message, color);
   }
 
   private next(question: Question<any>): void {
@@ -64,20 +65,20 @@ class QuestionRouter {
         this.advise(`Please make sure the ${answer} is NOT plugged into your computer.`)
         return this.next(new IsDevicePluggedInQuestionOne(this.nextQuestionNumber));
       case 'isDevicePluggedInOne':
-        if (answer === 'YES') {
+        if (answer === 'Yes') {
           this.advise('Please unplug it then.');   
           return this.next(new AnotherDeviceQuestion(this.nextQuestionNumber));
         }
         this.advise('Excellent! Go ahead and plug it in now.');
         return this.next(new IsDevicePluggedInQuestionTwo(this.nextQuestionNumber));
       case 'isDevicePluggedInTwo':
-        if (answer === 'NO') {
+        if (answer === 'No') {
           this.advise('I just... can\'t. Let\'s start over.');
           return this.next(new AnotherDeviceQuestion(this.nextQuestionNumber));
         }
         return;
       case 'anotherDevice':
-        if (answer === 'YES') {
+        if (answer === 'Yes') {
           console.log('');
           return this.next(new DeviceQuestion(this.nextQuestionNumber));
         }
