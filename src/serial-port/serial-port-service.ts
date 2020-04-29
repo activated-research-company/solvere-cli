@@ -46,10 +46,10 @@ class SerialPortService {
         this.targetDeviceType = answer;
         break;
       case 'isDevicePluggedInOne':
-        if (!answer) { this.reset(); }
+        if (answer === 'NO') { this.reset(); }
         break;
       case 'isDevicePluggedInTwo':
-        if (answer) {
+        if (answer === 'YES') {
           this.findNewSerialPort()
             .then(this.configure.bind(this))
             .then(() => {

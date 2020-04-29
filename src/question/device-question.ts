@@ -1,5 +1,5 @@
 import { Question } from "./question";
-import { Answers } from "./answers";
+import { Answers } from "./answers/answers";
 
 enum DeviceAnswers {
   cellAir = 'Alicat Flow Controller (Cell Air)',
@@ -7,14 +7,12 @@ enum DeviceAnswers {
   fidHydrogen = 'Alicat Flow Controller (FID Hydrogen)',
   pressureController = 'Alicat Pressure Controller',
   vocSensor = 'Ohmtech VOC Sensor',
-  quit = 'Quit',
 };
 
 class DeviceQuestion extends Question<string> {
   constructor(questionNumber: number) {
     super(
       questionNumber,
-      'list',
       'device',
       'What device do you want to configure?',
       new Answers(DeviceAnswers),

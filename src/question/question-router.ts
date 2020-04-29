@@ -57,26 +57,27 @@ class QuestionRouter {
   }
 
   private onAnsweredQuestion({ name, answer }: Answers): void {
+    if (answer === 'Quit') { return this.quit(); }
+
     switch (name.split('|')[0]) {
       case 'device':
-        if (answer === 'Quit') { return this.quit(); } // TODO: add quit to all options
         this.advise(`Please make sure the ${answer} is NOT plugged into your computer.`)
         return this.next(new IsDevicePluggedInQuestionOne(this.nextQuestionNumber));
       case 'isDevicePluggedInOne':
-        if (answer) {
+        if (answer === 'YES') {
           this.advise('Please unplug it then.');   
           return this.next(new AnotherDeviceQuestion(this.nextQuestionNumber));
         }
         this.advise('Excellent! Go ahead and plug it in now.');
         return this.next(new IsDevicePluggedInQuestionTwo(this.nextQuestionNumber));
       case 'isDevicePluggedInTwo':
-        if (!answer) {
+        if (answer === 'NO') {
           this.advise('I just... can\'t. Let\'s start over.');
           return this.next(new AnotherDeviceQuestion(this.nextQuestionNumber));
         }
         return;
       case 'anotherDevice':
-        if (answer) {
+        if (answer === 'YES') {
           console.log('');
           return this.next(new DeviceQuestion(this.nextQuestionNumber));
         }
