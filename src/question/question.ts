@@ -1,5 +1,6 @@
 
 import { Answers } from "./answers/answers";
+import Separator from 'inquirer/lib/objects/separator';
 
 abstract class Question<T> {
   constructor(
@@ -9,7 +10,7 @@ abstract class Question<T> {
     private answers: Answers,
   ) {};
 
-  public serialize(): { name: string, type: string, message: string, choices: string[] | null} {
+  public serialize(): { name: string, type: string, message: string, choices: (string|Separator)[] | null} {
     // TODO: why does name need to be unique (question number) to ask the same question >= twice (rxjs/inquirer issue)
     return {
       name: `${this.name}|${this.questionNumber}`,
