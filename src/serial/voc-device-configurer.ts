@@ -3,16 +3,17 @@ import SerialPort from 'serialport';
 
 class VocDeviceConfigurer implements SerialDeviceConfigurer {
 
-  parseData(data: any): string {
+  private parseData(data: any): string {
     return data.toString().replace(/(\r\n|\n|\r)/gm,"");
   }
 
-  configure(serialPort: SerialPort): Promise<boolean> {
+  public configure(path: string): Promise<any> {
+    const serialPort = new SerialPort(path, { autoOpen: false });
       return new Promise((resolve, reject) => {
         serialPort.on('data', (data) => {
           if (this.parseData(data) === '*** Config: Set output format to JSON.') {
             serialPort.close();
-            resolve(true);
+            resolve();
           }
         });
 

@@ -1,14 +1,12 @@
 import SerialPort from 'serialport';
 import { Observable, Subject } from 'rxjs';
 import { Answers } from 'inquirer';
-import { DeviceAnswers } from '../question/device-question';
-import VocDeviceConfigurer from '../serial-device/voc-device-configurer';
-import Advisor from '../advisor/advisor';
-import AlicatDeviceConfigurer from '../serial-device/alicat-device-configurer';
+import { SerialDevice } from './serial-device';
+import { SerialDeviceConfigurerResolver } from './serial-device-configurer-resolver';
 
 class ConfigurationResult {
   constructor(
-    public device: string,
+    public serialDevice: SerialDevice | null,
     public configured: boolean,
     public error?: string,
   ) {
@@ -16,13 +14,15 @@ class ConfigurationResult {
   }
 }
 
-class SerialPortService {
+class SerialDeviceService {
   private serialPorts: string[] = [];
-  private targetDeviceType: string = '';
+  private targetDeviceType: SerialDevice | null;
   public subject: Subject<ConfigurationResult>;
 
-  constructor(private advisor: Advisor) {
+  constructor(
+    private serialDeviceConfigurerResolver: SerialDeviceConfigurerResolver) {
     this.subject = new Subject();
+    this.targetDeviceType = null;
     this.reset();
   }
 
@@ -71,11 +71,11 @@ class SerialPortService {
     return this;
   }
   
-  public getTargetDeviceType(): string {
+  public getTargetDeviceType(): SerialDevice | null {
     return this.targetDeviceType;
   }
 
-  private findNewSerialPort(): Promise<SerialPort | null> {
+  private findNewSerialPort(): Promise<string | null> {
     return SerialPort
       .list()
       .then((ports) => {
@@ -85,19 +85,18 @@ class SerialPortService {
           });
         });
       })
-      .then((port) => port ? new SerialPort(port.path, { autoOpen: false }) : null);
+      .then((port) => port ? port.path: null);
   }
   
-  configure(serialPort: SerialPort | null): Promise<boolean> {
-    if (!serialPort) { return Promise.reject(`I could not locate the ${this.targetDeviceType}.`); }
-    switch (this.targetDeviceType) {
-      case DeviceAnswers.vocSensor:
-        return new VocDeviceConfigurer().configure(serialPort);
-      case DeviceAnswers.cellAir:
-        return new AlicatDeviceConfigurer().configure(serialPort);
-    }
-    return Promise.reject('This device is not a valid choice.');
+  private configure(path: string | null): Promise<any> {
+    if (!path) { return Promise.reject(`I could not locate the ${this.targetDeviceType}.`); }
+    const configurer = this
+      .serialDeviceConfigurerResolver
+      .getConfigurer(this.targetDeviceType);
+      
+    if (configurer) { return configurer.configure(path); }
+    return Promise.reject('Could not find a matching configurer.')
   }
 }
 
-export { SerialPortService, ConfigurationResult };
+export { SerialDeviceService, ConfigurationResult };

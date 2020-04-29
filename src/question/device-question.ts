@@ -1,13 +1,6 @@
-import { Question } from "./question";
-import { Answers } from "./answers/answers";
-
-enum DeviceAnswers {
-  cellAir = 'Alicat Flow Controller (Cell Air)',
-  fidAir = 'Alicat Flow Controller (FID Air)',
-  fidHydrogen = 'Alicat Flow Controller (FID Hydrogen)',
-  pressureController = 'Alicat Pressure Controller',
-  vocSensor = 'Ohmtech VOC Sensor',
-};
+import { Question } from './question';
+import { Answers } from './answers/answers';
+import { SerialDevice } from '../serial/serial-device';
 
 class DeviceQuestion extends Question<string> {
   constructor(questionNumber: number) {
@@ -15,9 +8,9 @@ class DeviceQuestion extends Question<string> {
       questionNumber,
       'device',
       'What device do you want to configure?',
-      new Answers(DeviceAnswers),
+      new Answers(SerialDevice),
     )
   }
 }
 
-export { DeviceQuestion, DeviceAnswers };
+export { DeviceQuestion };

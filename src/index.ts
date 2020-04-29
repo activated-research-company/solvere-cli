@@ -6,7 +6,8 @@ import { program } from 'commander';
 import { prompt } from 'inquirer';
 
 import Advisor from './advisor/advisor';
-import { SerialPortService } from './serial-port/serial-port-service';
+import { SerialDeviceConfigurerResolver } from './serial/serial-device-configurer-resolver';
+import { SerialPortService } from './serial/serial-device-service';
 
 import { Subject } from 'rxjs'
 import QuestionRouter from './question/question-router';
@@ -15,7 +16,8 @@ const prompts = new Subject<any>();
 const advisor = new Advisor()
   .advise(blue(figlet.textSync('SOLVERE - CLI')));
 
-const serialPortService = new SerialPortService(advisor);
+const serialDeviceConfigurerResolver = new SerialDeviceConfigurerResolver();
+const serialPortService = new SerialPortService(serialDeviceConfigurerResolver);
 
 program
   .version('1.0.0')

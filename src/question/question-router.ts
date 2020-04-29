@@ -6,12 +6,12 @@ import { DeviceQuestion } from './device-question';
 import { IsDevicePluggedInQuestionOne } from './is-device-plugged-in-question-one';
 import { IsDevicePluggedInQuestionTwo } from './is-device-plugged-in-question-two';
 import { AnotherDeviceQuestion } from './another-device-question';
-import { ConfigurationResult } from '../serial-port/serial-port-service';
+import { ConfigurationResult } from '../serial/serial-device-service';
 import chalk from 'chalk';
 
 class QuestionRouter {
 
-  nextQuestionNumber: number;
+  private nextQuestionNumber: number;
 
   constructor(
     private advisor: Advisor,
@@ -20,9 +20,9 @@ class QuestionRouter {
       this.nextQuestionNumber = 0;
   }
 
-  private onConfigurationResult({ device, configured, error}: ConfigurationResult): void {
+  private onConfigurationResult({ serialDevice, configured, error}: ConfigurationResult): void {
     if (configured) {
-      this.advise(`I've succesfully configured the ${device}.`)
+      this.advise(`I've succesfully configured the ${serialDevice}.`)
       return this.next(new AnotherDeviceQuestion(this.nextQuestionNumber));
     }
     this.advise(error, chalk.red);
@@ -53,7 +53,7 @@ class QuestionRouter {
   }
 
   private quit(): void {
-    this.advisor.advise('Ok, see you next time!');
+    this.advisor.advise('Ok. I\'ll see you next time!');
     return this.subject.complete();
   }
 
