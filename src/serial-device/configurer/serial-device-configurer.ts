@@ -38,7 +38,7 @@ abstract class SerialDeviceConfigurer {
   /** Returns a promise that resolves with an open SerialPort
    * 
    * @param path The path of the serial port you want to open
-   * @param options The settings to use when connecting to the serial port
+   * @param options Options for opening and communicating with the SerialPort
    */
   protected getSerialPort(path: string, options: SerialPortOptions): Promise<SerialPort> {
 
@@ -62,9 +62,8 @@ abstract class SerialDeviceConfigurer {
   /** Configures a serial device to work with the Solvere
    * 
    * @param path The path (COM, tty) for the device you want to configure
-   * @param options Options for opening and communicating with the SerialPort
    */
-  abstract configure(path: string, options: SerialPortOptions): Promise<any>;
+  abstract configure(path: string): Promise<any>;
 }
 
 export { SerialDeviceConfigurer, SerialPortOptions };
