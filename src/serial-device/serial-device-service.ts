@@ -2,7 +2,7 @@ import SerialPort from 'serialport';
 import { Observable, Subject } from 'rxjs';
 import { Answers } from 'inquirer';
 import { SerialDevice } from './serial-device';
-import { SerialDeviceConfigurerResolver } from './serial-device-configurer-resolver';
+import { SerialDeviceConfigurerResolver } from './configurer/serial-device-configurer-resolver';
 
 class ConfigurationResult {
   constructor(

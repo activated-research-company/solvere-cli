@@ -6,7 +6,7 @@ import { DeviceQuestion } from './device-question';
 import { IsDevicePluggedInQuestionOne } from './is-device-plugged-in-question-one';
 import { IsDevicePluggedInQuestionTwo } from './is-device-plugged-in-question-two';
 import { AnotherDeviceQuestion } from './another-device-question';
-import { ConfigurationResult } from '../serial/serial-device-service';
+import { ConfigurationResult } from '../serial-device/serial-device-service';
 import chalk from 'chalk';
 
 class QuestionRouter {

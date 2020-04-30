@@ -1,6 +1,6 @@
 import { Question } from './question';
 import { Answers } from './answers/answers';
-import { SerialDevice } from '../serial/serial-device';
+import { SerialDevice } from '../serial-device/serial-device';
 
 class DeviceQuestion extends Question<string> {
   constructor(questionNumber: number) {
