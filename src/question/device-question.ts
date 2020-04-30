@@ -1,6 +1,7 @@
 import { Question } from './question';
 import { Answers } from './answers/answers';
 import { SerialDevice } from '../serial-device/serial-device';
+import { PhidgetDevice } from '../phidget/phidget-device';
 
 class DeviceQuestion extends Question<string> {
   constructor(questionNumber: number) {
@@ -8,7 +9,7 @@ class DeviceQuestion extends Question<string> {
       questionNumber,
       'device',
       'What device do you want to configure?',
-      new Answers(SerialDevice),
+      new Answers({ ...SerialDevice, ...PhidgetDevice }),
     )
   }
 }

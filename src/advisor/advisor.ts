@@ -12,16 +12,12 @@ class Advisor {
   public connect(observable: Observable<Answers>) {
     observable.subscribe(this.onQuestionAnswered.bind(this));
   }
-
-  private newLine() {
-    if (!this.adviseGiven) { console.log(''); }
-  }
-
+  
   public advise(message?: string, color?: chalk.Chalk): Advisor {
     if (message) {
-      this.newLine();
+      if (!this.adviseGiven) { console.log(''); }
       console.log(color ? color(message) : message);
-      this.newLine();
+      if (!this.adviseGiven) { console.log(''); }
       this.adviseGiven = true;
     }
     return this;
