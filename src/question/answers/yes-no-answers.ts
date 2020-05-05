@@ -9,4 +9,4 @@ class YesNoAnswers extends Answers {
   }
 }
 
-export { YesNoAnswers }
+export { YesNoAnswers };

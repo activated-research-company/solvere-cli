@@ -1,4 +1,4 @@
-import { Question } from "./question";
+import Question from './question';
 import { YesNoAnswers } from './answers/yes-no-answers';
 
 class IsDevicePluggedInQuestionOne extends Question<boolean> {
@@ -12,4 +12,4 @@ class IsDevicePluggedInQuestionOne extends Question<boolean> {
   }
 }
 
-export { IsDevicePluggedInQuestionOne };
+export default IsDevicePluggedInQuestionOne;

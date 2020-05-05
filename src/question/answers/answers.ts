@@ -1,9 +1,7 @@
 import Separator from 'inquirer/lib/objects/separator';
 
 class Answers {
-  constructor(
-    private answers: { [key: string]: string },
-  ) {};
+  constructor(private answers: { [key: string]: string }) {}
 
   private getAnswerValue(key: string) {
     return this.answers[key];

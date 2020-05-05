@@ -6,10 +6,8 @@ class AlicatPressureControlDeviceConfigurer extends AlicatDeviceConfigurer {
   }
 
   public configure(path: string): Promise<any> {
-    return super
-      .configure(path)
-      .then(() => this.device.complete());
+    return super.configure(path).then(() => this.device.complete());
   }
 }
 
-export { AlicatPressureControlDeviceConfigurer }
+export { AlicatPressureControlDeviceConfigurer };
