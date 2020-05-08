@@ -88,6 +88,7 @@ class QuestionRouter {
           break;
         case 'anotherDevice':
           if (answer === 'Yes') {
+            console.log(''); // just a new line between questions (empty advise)
             this.next(new DeviceQuestion(this.nextQuestionNumber));
             break;
           }

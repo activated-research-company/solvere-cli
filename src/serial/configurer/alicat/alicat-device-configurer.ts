@@ -57,16 +57,18 @@ abstract class AlicatDeviceConfigurer extends SerialDeviceConfigurer {
 
   protected setId({ serialPort, id }: ConfigurerFunctionParms): Promise<ConfigurerFunctionParms> {
     return new Promise((resolve, reject) => {
-      const dataTimeout = setTimeout(() => {
-        dataSubscription.unsubscribe();
-        reject(`Could not change the device id from ${id} to ${this.targetId}.`);
-      }, 1000);
+      let dataTimeout: NodeJS.Timeout;
 
       const dataSubscription = this.device.pipe(filter((device) => device.data)).subscribe(({ data }) => {
         clearTimeout(dataTimeout);
         dataSubscription.unsubscribe();
         resolve(new ConfigurerFunctionParms(serialPort, data[0].toLowerCase()));
       });
+
+      dataTimeout = setTimeout(() => {
+        dataSubscription.unsubscribe();
+        reject(`Could not change the device id from ${id} to ${this.targetId}.`);
+      }, 1000);
 
       this.write(serialPort, `${id}@=${this.targetId}`);
     });

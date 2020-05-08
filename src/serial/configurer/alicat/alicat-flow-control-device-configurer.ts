@@ -18,28 +18,33 @@ class AlicatFlowControlDeviceConfigurer extends AlicatDeviceConfigurer {
     const rampUnits = 4;
 
     return new Promise((resolve, reject) => {
-      const dataTimeout = setTimeout(() => {
-        dataSubscription.unsubscribe();
-        reject(`Could not change the device ramp rate to ${rampRate} SCCM/s.`);
-      }, 1000);
+      let dataTimeout: NodeJS.Timeout;
 
       const dataSubscription = this.device.pipe(filter((device) => device.data)).subscribe(({ data }) => {
         switch (data) {
           case `${id.toUpperCase()}   160 = ${rampRate}`:
-            this.write(serialPort, `${id}$$161=${rampTime}`);
+            this.write(serialPort, `${id}W161=${rampTime}`);
             break;
           case `${id.toUpperCase()}   161 = ${rampTime}`:
-            this.write(serialPort, `${id}$$162=${rampUnits}`);
+            this.write(serialPort, `${id}W162=${rampUnits}`);
             break;
           case `${id.toUpperCase()}   162 = ${rampUnits}`:
             dataSubscription.unsubscribe();
             resolve();
             break;
+          default:
+            reject(`Received unknown response: ${data}`);
+            break;
         }
         clearTimeout(dataTimeout);
       });
 
-      this.write(serialPort, `${id}$$160=${rampRate}`);
+      dataTimeout = setTimeout(() => {
+        dataSubscription.unsubscribe();
+        reject(`Could not change the device ramp rate to ${rampRate} SCCM/s.`);
+      }, 1000);
+
+      this.write(serialPort, `${id}W160=${rampRate}`);
     });
   }
 
